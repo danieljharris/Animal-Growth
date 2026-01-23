@@ -77,6 +77,3 @@ eclipse-*bin/
 /.sass-cache
 # User-specific .bazelrc
 user.bazelrc
-
-### Custom ###
-.local-assets/
