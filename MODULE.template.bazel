@@ -16,9 +16,5 @@ maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
 
 use_repo(maven, "maven")
 
-http_jar = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
-
-http_jar(
-    name = "remote-hytale-server",
-    url = "https://artifacts.yakovliam.com/HytaleServer.jar",
-)
+hytale = use_extension("//build_defs/hytale/import_bundles:extension.bzl", "hytale_ext")
+use_repo(hytale, "remote_hytale_server")
