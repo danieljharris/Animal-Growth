@@ -1,9 +1,8 @@
-package com.example.exampleplugin;
+package com.example.exampleplugin.config;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.ExtraInfo;
 import com.hypixel.hytale.codec.KeyedCodec;
-import com.hypixel.hytale.codec.RawJsonCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.schema.SchemaContext;

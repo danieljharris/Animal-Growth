@@ -12,7 +12,7 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.Ref;
 import com.example.exampleplugin.command.ExampleCommand;
-import com.example.exampleplugin.ExampleConfig;
+import com.example.exampleplugin.config.ExampleConfig;
 import com.hypixel.hytale.server.core.util.Config;
 
 import javax.annotation.Nonnull;
