@@ -12,6 +12,8 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.Ref;
 import com.example.exampleplugin.command.ExampleCommand;
+import com.example.exampleplugin.ExampleConfig;
+import com.hypixel.hytale.server.core.util.Config;
 
 import javax.annotation.Nonnull;
 
@@ -22,12 +24,8 @@ import org.slf4j.LoggerFactory;
 
 public class ExamplePlugin extends JavaPlugin {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExamplePlugin.class);
+    private final Config<ExampleConfig> config = this.withConfig("ExamplePlugin", ExampleConfig.CODEC);
 
-    /**
-     * Constructor for ExamplePlugin.
-     *
-     * @param init The JavaPluginInit instance.
-     */
     public ExamplePlugin(@Nonnull JavaPluginInit init) {
         super(init);
     }
@@ -35,12 +33,15 @@ public class ExamplePlugin extends JavaPlugin {
     @Override
     protected void setup() {
         LOGGER.info("Registering ExamplePlugin!");
+        config.save();
     }
 
     @Override
     public void start() {
         LOGGER.info("Starting ExamplePlugin!");
 
-        this.getCommandRegistry().registerCommand(new ExampleCommand());
+        this.getCommandRegistry().registerCommand(new ExampleCommand(config.get().getGrowsUpInto()));
+
+        // this.config = this.withConfig("ExamplePlugin", ExampleConfig.CODEC);
     }
 }
