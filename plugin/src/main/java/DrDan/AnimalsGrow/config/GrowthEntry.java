@@ -1,4 +1,4 @@
-package com.example.exampleplugin;
+package DrDan.AnimalsGrow.config;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;

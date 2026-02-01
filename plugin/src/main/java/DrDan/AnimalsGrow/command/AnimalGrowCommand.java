@@ -1,4 +1,4 @@
-package com.example.exampleplugin.command;
+package DrDan.AnimalsGrow.command;
 
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.server.core.Message;
@@ -28,8 +28,8 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3f;
-import com.example.exampleplugin.config.ExampleConfig;
-import com.example.exampleplugin.config.GrowthEntry;
+import DrDan.AnimalsGrow.config.AnimalGrowConfig;
+import DrDan.AnimalsGrow.config.GrowthEntry;
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.component.Ref;
@@ -92,11 +92,11 @@ import org.slf4j.LoggerFactory;
 //   }
 // }
 
-public class ExampleCommand extends AbstractPlayerCommand {
+public class AnimalGrowCommand extends AbstractPlayerCommand {
     public static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
     private final List<GrowthEntry> config;
 
-    public ExampleCommand(List<GrowthEntry> config) {
+    public AnimalGrowCommand(List<GrowthEntry> config) {
         super("example", "An example command");
         this.config = config;
     }

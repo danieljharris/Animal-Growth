@@ -1,9 +1,8 @@
-package com.example.exampleplugin;
+package DrDan.AnimalsGrow.config;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.ExtraInfo;
 import com.hypixel.hytale.codec.KeyedCodec;
-import com.hypixel.hytale.codec.RawJsonCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.schema.SchemaContext;
@@ -16,10 +15,10 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import org.bson.BsonValue;
 
-public class ExampleConfig {
+public class AnimalGrowConfig {
     private List<GrowthEntry> growsUpInto = new ArrayList<>();
 
-    public ExampleConfig() {
+    public AnimalGrowConfig() {
         growsUpInto.add(new GrowthEntry("Lamb", "Sheep", 600));
         growsUpInto.add(new GrowthEntry("Piglet", "Pig", 900));
     }
@@ -51,7 +50,7 @@ public class ExampleConfig {
         }
     }
 
-    public static final BuilderCodec<ExampleConfig> CODEC = BuilderCodec.builder(ExampleConfig.class, ExampleConfig::new)
+    public static final BuilderCodec<AnimalGrowConfig> CODEC = BuilderCodec.builder(AnimalGrowConfig.class, AnimalGrowConfig::new)
         .append(new KeyedCodec<List<GrowthEntry>>("GrowsUpInto", new ListCodec()),
                 (exConfig, val) -> exConfig.growsUpInto = val,
                 exConfig -> exConfig.growsUpInto).add()

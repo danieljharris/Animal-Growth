@@ -71,7 +71,7 @@ Once the server is running, you can iterate quickly on your plugin:
 ```
 3. In-game, reload your plugin:
 ```
-/plugin reload com.example:ExamplePlugin
+/plugin reload DrDan:AnimalsGrow
 ```
 
 The server will reload your updated plugin without needing a full restart.

@@ -18,7 +18,7 @@ _jar_name = "{}-{}.jar".format(ARTIFACT_NAME, VERSION)
 
 java_library(
     name = "plugin_lib",
-    srcs = glob(["src/main/java/com/example/exampleplugin/**/*.java"]),
+    srcs = glob(["src/main/java/DrDan/AnimalsGrow/**/*.java"]),
     deps = shade_deps + provided_deps,
 )
 
