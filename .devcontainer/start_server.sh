@@ -146,8 +146,28 @@ fi
 
 cd "/workspace/server"
 
+# Create a named pipe for command input if it doesn't exist
+COMMAND_PIPE="/tmp/hytale_commands.fifo"
+if [ ! -p "$COMMAND_PIPE" ]; then
+    mkfifo "$COMMAND_PIPE"
+fi
+
+# Store the server PID
+echo $$ > /tmp/hytale_server.pid
+
 echo "--- Starting Hytale Server ---"
-java -jar "$SERVER_JAR" \
+# Run the server with input from the named pipe in the background
+tail -f "$COMMAND_PIPE" | java -jar "$SERVER_JAR" \
     --session-token "$SESSION_TOKEN" \
     --identity-token "$IDENTITY_TOKEN" \
-    $SERVER_ARGS
+    $SERVER_ARGS &
+
+# Store the java process PID
+JAVA_PID=$!
+echo $JAVA_PID > /tmp/hytale_java.pid
+
+# Wait for the Java process
+wait $JAVA_PID
+
+# Cleanup
+rm -f "$COMMAND_PIPE" /tmp/hytale_server.pid /tmp/hytale_java.pid
