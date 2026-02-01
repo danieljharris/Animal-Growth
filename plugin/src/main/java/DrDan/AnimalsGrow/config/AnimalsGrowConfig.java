@@ -8,6 +8,7 @@ import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.schema.SchemaContext;
 import com.hypixel.hytale.codec.schema.config.Schema;
 import com.hypixel.hytale.codec.util.RawJsonReader;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,12 +16,12 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import org.bson.BsonValue;
 
-public class AnimalGrowConfig {
+public class AnimalsGrowConfig {
     private List<GrowthEntry> growsUpInto = new ArrayList<>();
 
-    public AnimalGrowConfig() {
-        growsUpInto.add(new GrowthEntry("Lamb", "Sheep", 600));
-        growsUpInto.add(new GrowthEntry("Piglet", "Pig", 900));
+    public AnimalsGrowConfig() {
+        growsUpInto.add(new GrowthEntry("Sheep_Lamb", "Sheep", 600));
+        growsUpInto.add(new GrowthEntry("Pig_Piglet", "Pig", 900));
     }
 
     private static class ListCodec implements Codec<List<GrowthEntry>> {
@@ -50,7 +51,7 @@ public class AnimalGrowConfig {
         }
     }
 
-    public static final BuilderCodec<AnimalGrowConfig> CODEC = BuilderCodec.builder(AnimalGrowConfig.class, AnimalGrowConfig::new)
+    public static final BuilderCodec<AnimalsGrowConfig> CODEC = BuilderCodec.builder(AnimalsGrowConfig.class, AnimalsGrowConfig::new)
         .append(new KeyedCodec<List<GrowthEntry>>("GrowsUpInto", new ListCodec()),
                 (exConfig, val) -> exConfig.growsUpInto = val,
                 exConfig -> exConfig.growsUpInto).add()
