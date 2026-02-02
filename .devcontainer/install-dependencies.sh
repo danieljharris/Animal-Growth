@@ -18,6 +18,10 @@ if [ ! -d "$SDKMAN_DIR/candidates/gradle/8.5" ]; then
 fi
 sdk default gradle 8.5
 
+# Pre-download Gradle dependencies for IDE Ctrl+Click support
+# This ensures navigation works immediately without waiting for VS Code import
+cd /workspace && ./gradlew build --quiet || true
+
 # install buildifier
 curl -L https://github.com/bazelbuild/buildtools/releases/download/v8.2.1/buildifier-linux-arm64 \
     -o /usr/local/bin/buildifier
