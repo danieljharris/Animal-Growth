@@ -155,8 +155,25 @@ fi
 # Store the server PID
 echo $$ > /tmp/hytale_server.pid
 
+# Cleanup function for Ctrl+C
+cleanup_server() {
+    echo ""
+    echo "Shutting down server..."
+    if [ -n "$TAIL_PID" ] && kill -0 "$TAIL_PID" 2>/dev/null; then
+        kill "$TAIL_PID" 2>/dev/null
+    fi
+    if [ -n "$JAVA_PID" ] && kill -0 "$JAVA_PID" 2>/dev/null; then
+        kill "$JAVA_PID" 2>/dev/null
+        wait "$JAVA_PID" 2>/dev/null
+    fi
+    rm -f "$COMMAND_PIPE" /tmp/hytale_server.pid /tmp/hytale_java.pid
+    exit 0
+}
+
+trap cleanup_server SIGINT SIGTERM
+
 echo "--- Starting Hytale Server ---"
-# Run the server with input from the named pipe in the background
+# Run tail in background and capture its PID
 tail -f "$COMMAND_PIPE" | java -jar "$SERVER_JAR" \
     --session-token "$SESSION_TOKEN" \
     --identity-token "$IDENTITY_TOKEN" \
@@ -165,6 +182,9 @@ tail -f "$COMMAND_PIPE" | java -jar "$SERVER_JAR" \
 # Store the java process PID
 JAVA_PID=$!
 echo $JAVA_PID > /tmp/hytale_java.pid
+
+# Find the tail process PID (parent of java in the pipeline)
+TAIL_PID=$(ps -o pid= --ppid $$ | grep -v $JAVA_PID | head -n1 | xargs)
 
 # Wait for the Java process
 wait $JAVA_PID
