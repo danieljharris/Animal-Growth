@@ -7,6 +7,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore
 import com.hypixel.hytale.server.core.util.Config
 import org.slf4j.LoggerFactory
 import DrDan.AnimalsGrow.command.AnimalsGrowCommand
+import DrDan.AnimalsGrow.command.AnimalsGrowTestCommand
 import DrDan.AnimalsGrow.config.AnimalsGrowConfig
 import DrDan.AnimalsGrow.event.AnimalsGrowEvent
 import DrDan.AnimalsGrow.grow_ecs.AnimalsGrowComponent
@@ -56,5 +57,6 @@ class AnimalsGrow(init: JavaPluginInit) : JavaPlugin(init) {
 
         // Register commands
         commandRegistry.registerCommand(AnimalsGrowCommand())
+        commandRegistry.registerCommand(AnimalsGrowTestCommand())
     }
 }
