@@ -75,6 +75,7 @@ declare -A TEST_RESULTS
 TOTAL_TESTS=0
 PASSED=0
 FAILED=0
+EXPECTED_TOTAL=0
 
 while true; do
     CURRENT_TIME=$(date +%s)
@@ -95,10 +96,19 @@ while true; do
     fi
 
     # Check for test start
-    if echo "$NEW_LINES" | grep -q "\[AG_TEST:START\]"; then
+    # Detect overall start with expected test count: [AG_TEST:START:<num>]
+    if echo "$NEW_LINES" | grep -q "\[AG_TEST:START:[0-9]*\]"; then
         if [ "$TEST_STARTED" = false ]; then
             TEST_STARTED=true
-            echo "Tests started..."
+            EXPECTED_TOTAL=$(echo "$NEW_LINES" | sed -n 's/.*\[AG_TEST:START:\([0-9]*\)\].*/\1/p' | head -1)
+            echo "Tests started... expecting $EXPECTED_TOTAL test(s)"
+        fi
+    else
+        if echo "$NEW_LINES" | grep -q "\[AG_TEST:START\]"; then
+            if [ "$TEST_STARTED" = false ]; then
+                TEST_STARTED=true
+                echo "Tests started..."
+            fi
         fi
     fi
 
@@ -140,7 +150,7 @@ while true; do
         fi
     done
 
-    # End test if all results are in (count PASS and END:FAIL lines)
+    # End test if all results are in (count PASS and FAIL lines)
     TOTAL_TESTS=0
     PASSED=0
     FAILED=0
@@ -153,10 +163,14 @@ while true; do
         fi
     done
 
-    # If at least one result and all are accounted for, break
-    if [ "$TEST_STARTED" = true ] && [ $TOTAL_TESTS -gt 0 ]; then
-        # If no new lines for a while, assume done
-        if [ $((PASSED+FAILED)) -eq $TOTAL_TESTS ]; then
+    # If expected total known, only stop when we've received that many results
+    if [ "$TEST_STARTED" = true ] && [ $EXPECTED_TOTAL -gt 0 ]; then
+        if [ $((PASSED+FAILED)) -ge $EXPECTED_TOTAL ]; then
+            break
+        fi
+    else
+        # Fallback: if we've seen at least one result and no expected total, stop when all seen
+        if [ "$TEST_STARTED" = true ] && [ $TOTAL_TESTS -gt 0 ] && [ $((PASSED+FAILED)) -eq $TOTAL_TESTS ]; then
             break
         fi
     fi

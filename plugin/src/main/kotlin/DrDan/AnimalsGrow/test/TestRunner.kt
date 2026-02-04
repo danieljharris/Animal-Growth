@@ -29,50 +29,36 @@ import java.util.function.BiConsumer
  * Outputs structured log messages that can be parsed by test.sh
  * 
  * Log format:
- *   [AG_TEST:testName:PASS]
- *   [AG_TEST:testName:FAIL:reason]
- *   [AG_TEST:START]
- *   [AG_TEST:END:passed/total]
+ *  [AG_TEST:START]
+ *  [AG_TEST:START:${name}]
+ *  [AG_TEST:END:${name}:PASS]
+ *  [AG_TEST:END:${name}:FAIL:${reason}]
+ *  [AG_TEST:END:${name}:FAIL:Exception:${reason}]"
  */
 object TestRunner {
     private val tests = mutableListOf<TestCase>()
-    private var testsPassed = 0
-    private var testsFailed = 0
     
     init {
         // Register all tests
-        // tests.add(SpawnBabyTest())
         tests.add(BabyGrowTest())
-        // tests.add(BabyHasGrowthComponentTest())
-        // tests.add(GrowthProgressTest())
+        tests.add(BabyHasGrowthComponentTest())
     }
     
     fun runAllTests(world: World, store: Store<EntityStore>, playerPosition: Vector3d) {
-        println("[AG_TEST:START]")
+        println("[AG_TEST:START:${tests.size}]")
         println("Running ${tests.size} tests...")
         
-        // Clean up any existing test entities first
-        // cleanupTestEntities(store)
-
-        // Run each test on the world thread and wait for all to finish
-        for (test in tests) {
-            Thread {
+        Thread {
+            for (test in tests) {
                 try {
                     test.run(world, store, playerPosition)
                 } catch (e: Exception) {
-                    println("[AG_TEST:END:${test.name}:FAIL:Exception: ${e.message}]")
+                    println("[AG_TEST:END:${test.name}:FAIL:Exception:${e.message}]")
                 }
-            }.start()
-        }
-
-        // Schedule cleanup after 2 seconds without blocking the main thread
-        // Thread {
-        //     Thread.sleep(2000)
-        //     world.execute { TestRunner.cleanupTestEntities(store) }
-        // }.start()
+            }
+        }.start()
     }
     
-    // Find and remove entities with "Test_Bunny" DisplayNameComponent
     @JvmStatic
     fun cleanupTestEntities(store: Store<EntityStore>, name: String) {
         println("Cleaning up test entities with name: $name")
@@ -108,50 +94,6 @@ abstract class TestCase(val name: String) {
     }
 }
 
-// /**
-//  * Test: Spawn a baby bunny and verify it exists
-//  */
-// class SpawnBabyTest : TestCase("SpawnBaby") {
-//     override fun run(world: World, store: Store<EntityStore>, playerPosition: Vector3d): TestResult {
-//         val spawnPos = Vector3d(playerPosition.x + 2, playerPosition.y, playerPosition.z)
-        
-//         // Spawn a bunny (baby)
-//         val spawnResult = NPCPlugin.get().spawnNPC(store, "Bunny", null, spawnPos, Vector3f(0f, 0f, 0f))
-        
-//         if (spawnResult == null) {
-//             return TestResult(false, "spawnNPC returned null")
-//         }
-        
-//         val ref = spawnResult.first()
-//         if (ref == null) {
-//             return TestResult(false, "spawnNPC ref is null")
-//         }
-
-//         val message = Message.raw("Test_Bunny")
-//         store.replaceComponent(ref, DisplayNameComponent.getComponentType(), DisplayNameComponent(message))
-        
-//         // Verify the NPC exists
-//         val npcComponentType = NPCEntity.getComponentType() as? ComponentType<EntityStore, NPCEntity>
-//             ?: return TestResult(false, "Could not get NPCEntity component type")
-        
-//         val npc = store.getComponent(ref, npcComponentType)
-//         if (npc == null) {
-//             return TestResult(false, "Spawned entity has no NPCEntity component")
-//         }
-        
-//         if (npc.roleName != "Bunny") {
-//             return TestResult(false, "Expected roleName 'Bunny' but got '${npc.roleName}'")
-//         }
-
-//         Thread {
-//             Thread.sleep(2000)
-//             world.execute { TestRunner.cleanupTestEntities(store) }
-//         }.start()
-        
-//         return TestResult(true)
-//     }
-// }
-
 class BabyGrowTest : TestCase("BabyGrowTest") {
     override fun run(world: World, store: Store<EntityStore>, playerPosition: Vector3d) {
         start()
@@ -173,7 +115,6 @@ class BabyGrowTest : TestCase("BabyGrowTest") {
             val message = Message.raw(testNPCName)
             store.replaceComponent(ref, DisplayNameComponent.getComponentType(), DisplayNameComponent(message))
         }
-
 
         println("[AG_TEST:COMMAND:time midday]")
         println("[AG_TEST:COMMAND:time midnight]")
@@ -222,61 +163,60 @@ class BabyGrowTest : TestCase("BabyGrowTest") {
     }
 }
 
-// /**
-//  * Test: Verify spawned baby has AnimalsGrowComponent attached
-//  */
-// class BabyHasGrowthComponentTest : TestCase("BabyHasGrowthComponent") {
-//     override fun run(world: World, store: Store<EntityStore>, playerPosition: Vector3d): TestResult {
-//         val spawnPos = Vector3d(playerPosition.x + 4, playerPosition.y, playerPosition.z)
-        
-//         // Spawn a bunny
-//         val spawnResult = NPCPlugin.get().spawnNPC(store, "Bunny", null, spawnPos, Vector3f(0f, 0f, 0f))
-//             ?: return TestResult(false, "spawnNPC returned null")
-        
-//         val ref = spawnResult.first()
-//             ?: return TestResult(false, "spawnNPC ref is null")
-        
-//         // Check for AnimalsGrowComponent
-//         val growComponentType = AnimalsGrow.getComponentType()
-        
-//         val growComponent = store.getComponent(ref, growComponentType)
-//         if (growComponent == null) {
-//             return TestResult(false, "Baby does not have AnimalsGrowComponent - check if 'Bunny' is in growth config")
-//         }
-        
-//         return TestResult(true)
-//     }
-// }
+/**
+ * Test: Verify spawned baby has AnimalsGrowComponent attached
+ */
+class BabyHasGrowthComponentTest : TestCase("BabyHasGrowthComponent") {
+    override fun run(world: World, store: Store<EntityStore>, playerPosition: Vector3d) {
+        start()
+        val testNPCName = "Test_BabyHasGrowthComponent"
 
-// /**
-//  * Test: Verify growth component has valid data
-//  */
-// class GrowthProgressTest : TestCase("GrowthComponentData") {
-//     override fun run(world: World, store: Store<EntityStore>, playerPosition: Vector3d): TestResult {
-//         val spawnPos = Vector3d(playerPosition.x + 6, playerPosition.y, playerPosition.z)
+        val spawnPos = Vector3d(playerPosition.x + 2, playerPosition.y, playerPosition.z)
         
-//         // Spawn a bunny
-//         val spawnResult = NPCPlugin.get().spawnNPC(store, "Bunny", null, spawnPos, Vector3f(0f, 0f, 0f))
-//             ?: return TestResult(false, "spawnNPC returned null")
-        
-//         val ref = spawnResult.first()
-//             ?: return TestResult(false, "spawnNPC ref is null")
-        
-//         val growComponentType = AnimalsGrow.getComponentType()
-        
-//         val growComponent = store.getComponent(ref, growComponentType)
-//             ?: return TestResult(false, "No AnimalsGrowComponent on baby")
-        
-//         // Verify component has valid data
-//         if (growComponent.growthDurationSeconds <= 0) {
-//             return TestResult(false, "Growth duration is invalid: ${growComponent.growthDurationSeconds}")
-//         }
-        
-//         // Verify spawn time was set (not EPOCH)
-//         if (growComponent.spawnTime == Instant.EPOCH) {
-//             return TestResult(false, "Spawn time was not set (still EPOCH)")
-//         }
-        
-//         return TestResult(true)
-//     }
-// }
+        // Spawn a bunny
+        world.execute {
+            val spawnResult = NPCPlugin.get().spawnNPC(store, "Bunny", null, spawnPos, Vector3f(0f, 0f, 0f))
+                ?: return@execute
+            
+            val ref = spawnResult.first() ?: return@execute
+
+            val message = Message.raw(testNPCName)
+            store.replaceComponent(ref, DisplayNameComponent.getComponentType(), DisplayNameComponent(message))
+        }
+
+        Thread.sleep(1000) // Wait for the spawn to process
+
+        val hasGrowthComponent = arrayOf(false)
+        val checkLatch = CountDownLatch(1)
+
+        world.execute {
+            store.forEachChunk(BiConsumer { chunk: ArchetypeChunk<EntityStore>, commandBuffer: CommandBuffer<EntityStore> ->
+                for (i in 0 until chunk.size()) {
+                    val entityRef = chunk.getReferenceTo(i)
+                    val name: DisplayNameComponent = store.getComponent(entityRef, DisplayNameComponent.getComponentType()) ?: continue
+                    val displayName = name.displayName?.rawText ?: continue
+
+                    if (displayName == testNPCName) {
+                        val growthComponent = store.getComponent(entityRef, AnimalsGrow.getComponentType())
+                        if (growthComponent != null) {
+                            hasGrowthComponent[0] = true
+                        }
+                        break
+                    }
+                }
+            })
+            checkLatch.countDown()
+        }
+
+        try { checkLatch.await(5, TimeUnit.SECONDS) } catch (e: InterruptedException) {}
+
+        if (hasGrowthComponent[0]) {
+            result(true)
+        } else {
+            println("Spawned baby did not have AnimalsGrowComponent")
+            result(false, "Spawned baby did not have AnimalsGrowComponent")
+        }
+
+        world.execute { TestRunner.cleanupTestEntities(store, testNPCName) }
+    }
+}
