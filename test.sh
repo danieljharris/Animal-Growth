@@ -15,8 +15,6 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-
-
 # Configuration
 SERVER_DIR="./server"
 TIMEOUT=30  # seconds to wait for test results
@@ -140,12 +138,6 @@ while true; do
             if [ -z "${TEST_RESULTS[$TEST_NAME]:-}" ]; then
                 TEST_RESULTS[$TEST_NAME]="FAIL"
                 echo -e "  ${RED}✗ FAIL${NC}: $TEST_NAME - Exception: $REASON"
-            fi
-        elif echo "$line" | grep -q "\[AG_TEST:COMMAND:"; then
-            COMMAND=$(echo "$line" | sed -n 's/.*\[AG_TEST:COMMAND:\([^]]*\)\].*/\1/p')
-            if [ -n "$COMMAND" ] && [ -p "$COMMAND_FIFO" ]; then
-                echo "$COMMAND" > "$COMMAND_FIFO"
-                echo -e "  ${YELLOW}↪ Sent command to server:${NC} $COMMAND"
             fi
         fi
     done
