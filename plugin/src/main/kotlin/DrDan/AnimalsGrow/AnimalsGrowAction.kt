@@ -56,83 +56,79 @@ object AnimalsGrowAction {
         val npcEntity = store.getComponent(ref, npcComponentType) ?: return
         val npcName: String = npcEntity.roleName ?: return
 
-        for (growthEntry in config) {
-            if (growthEntry.baby == null || npcName != growthEntry.baby) continue
-            val adultName = growthEntry.adult ?: continue
+        var growthEntry = config.find { it.baby == npcName } ?: return
+        val adultName = growthEntry.adult ?: return
 
-            val transformComponentType = TransformComponent.getComponentType() as? ComponentType<EntityStore, TransformComponent> ?: return
-            val transform: TransformComponent = store.getComponent(ref, transformComponentType) ?: return
-            
-            // Capture properties to transfer BEFORE removing the baby
-            val transfer = captureTransferProperties(ref, store)
-            
-            // Log the transformation
-            println("Animal growing: $npcName -> $adultName at ${transform.position}")
-            
-            // Remove the baby entity
-            commandBuffer.removeEntity(ref, RemoveReason.REMOVE)
-            
-            // Spawn on world thread for thread safety
-            val world = Universe.get().defaultWorld
-            if (world != null) {
-                world.execute {
-                    var spawnPos = transform.position
-                    var blockSpawnPos = Vector3i(
-                        spawnPos.x.toInt(),
-                        spawnPos.y.toInt(),
-                        spawnPos.z.toInt()
+        val transformComponentType = TransformComponent.getComponentType() as? ComponentType<EntityStore, TransformComponent> ?: return
+        val transform: TransformComponent = store.getComponent(ref, transformComponentType) ?: return
+        
+        // Capture properties to transfer BEFORE removing the baby
+        val transfer = captureTransferProperties(ref, store)
+        
+        // Log the transformation
+        println("Animal growing: $npcName -> $adultName at ${transform.position}")
+        
+        // Remove the baby entity
+        commandBuffer.removeEntity(ref, RemoveReason.REMOVE)
+        
+        // Spawn on world thread for thread safety
+        val world = Universe.get().defaultWorld
+        if (world != null) {
+            world.execute {
+                var spawnPos = transform.position
+                var blockSpawnPos = Vector3i(
+                    spawnPos.x.toInt(),
+                    spawnPos.y.toInt(),
+                    spawnPos.z.toInt()
+                )
+
+                var blockType: BlockType = world.getBlockType(blockSpawnPos)?: return@execute
+                var material: BlockMaterial = blockType.material
+
+                if (material == BlockMaterial.Solid) {
+                    println("Spawn position blocked for adult at ${spawnPos}, searching nearby...")
+
+                    val offsets = listOf(
+                        Vector3i(-1, 0, -1),
+                        Vector3i(-1, 0, 0),
+                        Vector3i(-1, 0, 1),
+                        Vector3i(0, 0, -1),
+                        Vector3i(0, 0, 1),
+                        Vector3i(1, 0, -1),
+                        Vector3i(1, 0, 0),
+                        Vector3i(1, 0, 1),
                     )
+                    for (offset in offsets) {
 
-                    var blockType: BlockType = world.getBlockType(blockSpawnPos)?: return@execute
-                    var material: BlockMaterial = blockType.material
+                        var tempSpawnPos = blockSpawnPos
+                        var tempSpawnPosOffset = tempSpawnPos.add(offset)
 
-                    if (material == BlockMaterial.Solid) {
-                        println("Spawn position blocked for adult at ${spawnPos}, searching nearby...")
-
-                        val offsets = listOf(
-                            Vector3i(-1, 0, -1),
-                            Vector3i(-1, 0, 0),
-                            Vector3i(-1, 0, 1),
-                            Vector3i(0, 0, -1),
-                            Vector3i(0, 0, 1),
-                            Vector3i(1, 0, -1),
-                            Vector3i(1, 0, 0),
-                            Vector3i(1, 0, 1),
-                        )
-                        for (offset in offsets) {
-
-                            var tempSpawnPos = blockSpawnPos
-                            var tempSpawnPosOffset = tempSpawnPos.add(offset)
-
-                            val checkBlockType = world.getBlockType(tempSpawnPosOffset) ?: continue
-                            if (checkBlockType.material == BlockMaterial.Empty) {
-                                spawnPos = tempSpawnPosOffset.toVector3d()
-                                println("Found nearby spawn position for adult at ${spawnPos}")
-                                break
-                            }
+                        val checkBlockType = world.getBlockType(tempSpawnPosOffset) ?: continue
+                        if (checkBlockType.material == BlockMaterial.Empty) {
+                            spawnPos = tempSpawnPosOffset.toVector3d()
+                            println("Found nearby spawn position for adult at ${spawnPos}")
+                            break
                         }
                     }
-                    else {
-                        println("Spawn position clear for adult at ${spawnPos}")
-                    }
-
-                    // Set spawn location in center of block
-                    spawnPos = Vector3d(
-                        spawnPos.x.toInt().toDouble() + 0.5,
-                        spawnPos.y.toInt().toDouble(),
-                        spawnPos.z.toInt().toDouble() + 0.5
-                    )
-
-                    val spawnResult = NPCPlugin.get().spawnNPC(store, adultName, null, spawnPos, transform.rotation)
-                    
-                    val adultRef = spawnResult?.first()
-                    if (adultRef != null) { applyTransferProperties(adultRef, store, transfer) }
                 }
-            } else {
-                println("ERROR: Could not get default world from Universe!")
-            }
+                else {
+                    println("Spawn position clear for adult at ${spawnPos}")
+                }
 
-            break
+                // Set spawn location in center of block
+                spawnPos = Vector3d(
+                    spawnPos.x.toInt().toDouble() + 0.5,
+                    spawnPos.y.toInt().toDouble(),
+                    spawnPos.z.toInt().toDouble() + 0.5
+                )
+
+                val spawnResult = NPCPlugin.get().spawnNPC(store, adultName, null, spawnPos, transform.rotation)
+                
+                val adultRef = spawnResult?.first()
+                if (adultRef != null) { applyTransferProperties(adultRef, store, transfer) }
+            }
+        } else {
+            println("ERROR: Could not get default world from Universe!")
         }
     }
     

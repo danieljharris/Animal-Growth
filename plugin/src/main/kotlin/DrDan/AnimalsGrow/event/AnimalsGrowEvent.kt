@@ -45,25 +45,20 @@ class AnimalsGrowEvent(
         val npc = store.getComponent(ref, npcComponentType) ?: return
         val npcName = npc.roleName ?: return
 
-        for (growthEntry in config) {
-            if (growthEntry.baby == null || npcName != growthEntry.baby) continue
-
-            val growthSeconds = growthEntry.timeToGrowUpSeconds ?: continue
-            
-            // Get current in-game time to record spawn time
-            val worldTimeResource = store.getResource(WorldTimeResource.getResourceType())
-            val spawnTime = worldTimeResource?.gameTime ?: java.time.Instant.now()
-            
-            // Create component with in-game spawn time and growth duration
-            val animalsGrowComponent = AnimalsGrowComponent(
-                spawnTime = spawnTime,
-                growthDurationSeconds = growthSeconds.toLong()
-            )
-            
-            commandBuffer.addComponent(ref, AnimalsGrow.getComponentType(), animalsGrowComponent)
-            println("AnimalsGrowEvent: Added growth component to $npcName, will grow in ${growthSeconds}s (in-game time)")
-            break
-        }
+        var growthEntry = config.find { it.baby == npcName } ?: return
+        val growthSeconds = growthEntry.timeToGrowUpSeconds ?: return
+        
+        // Get current in-game time to record spawn time
+        val worldTimeResource = store.getResource(WorldTimeResource.getResourceType())
+        
+        // Create component with in-game spawn time and growth duration
+        val animalsGrowComponent = AnimalsGrowComponent(
+            spawnTime = worldTimeResource.gameTime,
+            growthDurationSeconds = growthSeconds.toLong()
+        )
+        
+        commandBuffer.addComponent(ref, AnimalsGrow.getComponentType(), animalsGrowComponent)
+        println("AnimalsGrowEvent: Added growth component to $npcName, will grow in ${growthSeconds}s (in-game time)")
     }
 
     override fun onEntityRemove(
