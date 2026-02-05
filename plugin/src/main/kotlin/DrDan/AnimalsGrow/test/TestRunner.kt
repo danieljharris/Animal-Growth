@@ -135,12 +135,12 @@ class BabyGrowTest : TestCase("BabyGrowTest") {
         start()
         val testNPCName = "Test_BabyGrowTest"
         val spawnPos = Vector3d(playerPosition.x + 2, playerPosition.y, playerPosition.z)
-        val ref = spawn(world, store, spawnPos, testNPCName)
+        spawn(world, store, spawnPos, testNPCName)
 
         println("[AG_TEST:COMMAND:time midday]")
         println("[AG_TEST:COMMAND:time midnight]")
         println("[AG_TEST:COMMAND:time midday]")
-        Thread.sleep(5000) // sleep for 5 seconds to day night cycle to advance and growth to occur
+        Thread.sleep(1000)
 
         val spawnedRef = getSpawned(world, store, testNPCName)
         if (spawnedRef == null) {
@@ -184,8 +184,6 @@ class BabyHasGrowthComponentTest : TestCase("BabyHasGrowthComponent") {
         val testNPCName = "Test_BabyHasGrowthComponent"
         val spawnPos = Vector3d(playerPosition.x + 2, playerPosition.y, playerPosition.z)
         val ref = spawn(world, store, spawnPos, testNPCName)
-
-        Thread.sleep(1000) // Wait for the spawn to process
 
         val hasGrowthComponent = arrayOf(false)
         val checkLatch = CountDownLatch(1)
@@ -238,7 +236,7 @@ class KeepHealthOnGrowTest : TestCase("KeepHealthOnGrowTest") {
         println("[AG_TEST:COMMAND:time midday]")
         println("[AG_TEST:COMMAND:time midnight]")
         println("[AG_TEST:COMMAND:time midday]")
-        Thread.sleep(5000) // sleep for 5 seconds to day night cycle to advance and growth to occur
+        Thread.sleep(1000)
 
         val spawnedRef = getSpawned(world, store, testNPCName)
         if (spawnedRef == null) {
