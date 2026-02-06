@@ -83,6 +83,24 @@ object AnimalsGrowAction {
         if (world != null) {
             world.execute {
                 var spawnPos = transform.position
+
+                var xSide: Int
+                var zSide: Int
+
+                if (spawnPos.x - spawnPos.x.toInt() > 0.5) {
+                    xSide = 1
+                }
+                else {
+                    xSide = -1
+                }
+
+                if (spawnPos.z - spawnPos.z.toInt() > 0.5) {
+                    zSide = 1
+                }
+                else {
+                    zSide = -1
+                }
+
                 var blockSpawnPos = Vector3i(
                     spawnPos.x.toInt(),
                     spawnPos.y.toInt(),
@@ -92,19 +110,22 @@ object AnimalsGrowAction {
                 var blockType: BlockType = world.getBlockType(blockSpawnPos)?: return@execute
                 var material: BlockMaterial = blockType.material
 
+                // Searches for the cloest empty block
+                val offsets = listOf(
+                    Vector3i(xSide, 0, 0),
+                    Vector3i(0, 0, zSide),
+                    Vector3i(xSide, 0, zSide),
+                )
+
+                // Searches for any blocks the adult may grow into
+                val offsetsInverse = listOf(
+                    Vector3i(-xSide, 0, 0),
+                    Vector3i(0, 0, -zSide),
+                    Vector3i(-xSide, 0, -zSide),
+                )
+
                 if (material == BlockMaterial.Solid) {
                     println("Spawn position blocked for adult at ${spawnPos}, searching nearby...")
-
-                    val offsets = listOf(
-                        Vector3i(-1, 0, -1),
-                        Vector3i(-1, 0, 0),
-                        Vector3i(-1, 0, 1),
-                        Vector3i(0, 0, -1),
-                        Vector3i(0, 0, 1),
-                        Vector3i(1, 0, -1),
-                        Vector3i(1, 0, 0),
-                        Vector3i(1, 0, 1),
-                    )
                     for (offset in offsets) {
 
                         var tempSpawnPos = blockSpawnPos
@@ -117,28 +138,39 @@ object AnimalsGrowAction {
                             break
                         }
                     }
+
+                    spawnPos = Vector3d(
+                        spawnPos.x.toInt().toDouble() + 0.5,
+                        spawnPos.y.toInt().toDouble(),
+                        spawnPos.z.toInt().toDouble() + 0.5
+                    )
                 }
                 else {
                     println("Spawn position clear for adult at ${spawnPos}")
+
+                    val neighborHasBlocks = offsetsInverse.any { offset ->
+                        var tempSpawnPos = blockSpawnPos
+                        var tempSpawnPosOffset = tempSpawnPos.add(offset)
+                        val bt = world.getBlockType(tempSpawnPosOffset)
+                        bt != null && bt.material != BlockMaterial.Empty
+                    }
+
+                    // If block close to baby move adult to center of the block to avoid gtowing into the block
+                    if (neighborHasBlocks) {
+                        spawnPos = Vector3d(
+                            spawnPos.x.toInt().toDouble() + 0.5,
+                            spawnPos.y.toInt().toDouble(),
+                            spawnPos.z.toInt().toDouble() + 0.5
+                        )
+                    }
                 }
 
-                // Set spawn location in center of block
-                spawnPos = Vector3d(
-                    spawnPos.x.toInt().toDouble() + 0.5,
-                    spawnPos.y.toInt().toDouble(),
-                    spawnPos.z.toInt().toDouble() + 0.5
-                )
-
                 val particlePosition = spawnPos
-                val particlePositionOffset = particlePosition.add(Vector3d(0.0, 1.0, 0.0))
+                val particlePositionOffset = particlePosition.add(Vector3d(0.0, 0.5, 0.0))
 
-                val playerSpatialResource = store.getResource(EntityModule.get().getPlayerSpatialResourceType()) as? SpatialResource<com.hypixel.hytale.component.Ref<EntityStore>, EntityStore>
+                val playerSpatialResource = store.getResource(EntityModule.get().getPlayerSpatialResourceType()) as? SpatialResource<Ref<EntityStore>, EntityStore>
                     ?: return@execute
-
-                val playerRefs = SpatialResource.getThreadLocalReferenceList<com.hypixel.hytale.server.core.universe.world.storage.EntityStore>()
-                @Suppress("UNCHECKED_CAST")
-                val kotlinPlayerRefs = playerRefs as MutableList<com.hypixel.hytale.component.Ref<EntityStore>>
-
+                val playerRefs = SpatialResource.getThreadLocalReferenceList<EntityStore>()
                 playerSpatialResource.getSpatialStructure().collect(particlePositionOffset, ParticleUtil.DEFAULT_PARTICLE_DISTANCE, playerRefs)
 
                 // Call ParticleUtil overload with explicit coordinates, rotation(0), scale=3, no sourceRef, null color
