@@ -1,4 +1,4 @@
-# Bazel Hytale Plugin Pipeline
+# Animal Growth - Hytale Plugin
 
 Author: Jacob Cohen farakovengineering.com
 
@@ -48,3 +48,6 @@ cd /home/server
 ## Notes
 - Offline: place Assets.zip and HytaleServer.jar in .local-assets before container creation.
 - Adjust deploy.sh if your dist target or copy path differs.
+
+# Credits
+- This project was started from the dev container example repo by Jacob Cohen (farakovengineering.com) here: https://github.com/farakov-engineering/bazel-hytale-plugin-pipeline
