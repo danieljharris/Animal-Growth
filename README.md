@@ -1,26 +1,43 @@
 # Life Cycle - Hytale Plugin
 
+# 🐾 Life Cycle – Animals Grow
+
 [![GitHub Repo](https://img.shields.io/badge/GitHub-Animal_Growth-blue?logo=github)](https://github.com/danieljharris/Animal-Growth)
 
-# Features
-## 1) Animals Grow Over Time
-- Done with **In-Game** time so sleeping speeds it up!
-- Same In-Game time as with crops in Hytale
-- Takes 1 In-Game day for animals to grow
-- All animals grow, manually spanwed and naturally with the world
+A Hytale mod that brings animal growth to life by letting baby animals mature naturally over time — just like crops 🌱
 
-## 2) Fence Detection
-- Animals stay in pens when they grow up!
-- Animals never grow into/through fences/walls
+---
 
-## 3) Groth Particle Effects
-- Green glow when animals grow up
-- Easily spot when babies grow
+## ✨ Features
 
-# Planned Features
-- Breeding
-- Breeding book | Instructions on what food each animal needs to breed
-- Nameplates | Name your animals!
+### 1) Animals Grow Over Time
+- Growth is based on **in-game time** — sleeping speeds it up!
+- Uses the **same time system as crops** in Hytale
+- Animals take **1 in-game day** to fully grow
+- Applies to **all animals**, whether:
+  - Naturally spawned by the world
+  - Manually spawned by players
+
+### 2) Fence Detection
+- Animals **stay inside pens** as they grow
+- No growing into or clipping through:
+  - Fences
+  - Walls
+  - Other solid blocks
+
+### 3) Groth Particle Effects
+- A **green glow effect** when animals grow up
+- Makes it easy to spot when babies mature
+
+---
+
+## 🚧 Planned Features
+
+- 🧬 **Breeding system**
+- 📘 **Breeding book**
+  - Shows which food each animal needs
+- 🏷️ **Nameplates**
+  - Name and identify your animals
 
 
 # Details About the Repo & Code/Test Structure
