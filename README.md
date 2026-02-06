@@ -2,6 +2,26 @@
 
 [![GitHub Repo](https://img.shields.io/badge/GitHub-Animal_Growth-blue?logo=github)](https://github.com/danieljharris/Animal-Growth)
 
+# Features
+## 1) Animals Grow Over Time
+- Done with **In-Game** time so sleeping speeds it up!
+- Same In-Game time as with crops in Hytale
+- Takes 1 In-Game day for animals to grow 
+
+## 2) Fence Detection
+- Animals stay in pens when they grow up!
+- Animals never grow into/through fences/walls
+
+## 3) Groth Particle Effects
+- Green glow when animals grow up
+- Easily spot when babies grow
+
+# Planned Features
+- Breeding
+- Breeding book | Instructions on what food each animal needs to breed
+- Nameplates | Name your animals!
+
+
 # Details About the Repo & Code/Test Structure
 ## Scripts
 ### Quick Start (Build, Deploy, and Run Server)
