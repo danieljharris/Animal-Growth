@@ -6,7 +6,8 @@
 ## 1) Animals Grow Over Time
 - Done with **In-Game** time so sleeping speeds it up!
 - Same In-Game time as with crops in Hytale
-- Takes 1 In-Game day for animals to grow 
+- Takes 1 In-Game day for animals to grow
+- All animals grow, manually spanwed and naturally with the world
 
 ## 2) Fence Detection
 - Animals stay in pens when they grow up!
