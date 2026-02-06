@@ -82,7 +82,10 @@ Swap out "DefaultEntityStatTypes|EntityStatTypes"
 find . -type f -name "*.jar" -print0 | xargs -0 -n1 sh -c 'jar tf "$0" 2>/dev/null | rg "DefaultEntityStatTypes|EntityStatTypes" -n --no-line-number && echo "-- in: $0"'
 ```
 ```
-jar tf /workspace/.local-assets/HytaleServer.jar | rg "ModelAsset"
+jar tf /workspace/.local-assets/HytaleServer.jar | rg "particle"
+```
+```
+jar tf /workspace/.local-assets/HytaleServer.jar | rg -i "particle" | sed -n '1,200p'
 ```
 
 ## Notes

@@ -1,27 +1,34 @@
 package DrDan.AnimalsGrow
 
-import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType
-import com.hypixel.hytale.math.vector.Vector3i
-import com.hypixel.hytale.math.vector.Vector3d
-import com.hypixel.hytale.protocol.BlockMaterial
 import com.hypixel.hytale.component.Ref
+import com.hypixel.hytale.protocol.Color
 import com.hypixel.hytale.component.Store
 import com.hypixel.hytale.server.core.Message
 import com.hypixel.hytale.server.npc.NPCPlugin
+import com.hypixel.hytale.math.vector.Vector3i
+import com.hypixel.hytale.math.vector.Vector3d
+import com.hypixel.hytale.protocol.BlockMaterial
 import com.hypixel.hytale.component.RemoveReason
 import com.hypixel.hytale.component.CommandBuffer
 import com.hypixel.hytale.component.ComponentType
-import com.hypixel.hytale.server.core.universe.Universe
 import com.hypixel.hytale.server.npc.entities.NPCEntity
+import com.hypixel.hytale.server.core.universe.Universe
+import com.hypixel.hytale.component.spatial.SpatialResource
 import com.hypixel.hytale.server.core.entity.nameplate.Nameplate
+import com.hypixel.hytale.server.core.modules.entity.EntityModule
+import com.hypixel.hytale.server.core.universe.world.ParticleUtil
 import com.hypixel.hytale.server.core.entity.effect.ActiveEntityEffect
 import com.hypixel.hytale.server.core.modules.entitystats.EntityStatMap
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore
+import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType
 import com.hypixel.hytale.server.core.entity.effect.EffectControllerComponent
+import com.hypixel.hytale.server.core.asset.type.particle.config.ParticleSpawner
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent
 import com.hypixel.hytale.server.core.modules.entity.component.DisplayNameComponent
 import com.hypixel.hytale.server.core.modules.entitystats.asset.DefaultEntityStatTypes
+
+import it.unimi.dsi.fastutil.objects.ObjectList;
 
 import DrDan.AnimalsGrow.config.GrowthEntry
 
@@ -121,6 +128,35 @@ object AnimalsGrowAction {
                     spawnPos.y.toInt().toDouble(),
                     spawnPos.z.toInt().toDouble() + 0.5
                 )
+
+                val particlePosition = spawnPos
+                val particlePositionOffset = particlePosition.add(Vector3d(0.0, 1.0, 0.0))
+
+                val playerSpatialResource = store.getResource(EntityModule.get().getPlayerSpatialResourceType()) as? SpatialResource<com.hypixel.hytale.component.Ref<EntityStore>, EntityStore>
+                    ?: return@execute
+
+                val playerRefs = SpatialResource.getThreadLocalReferenceList<com.hypixel.hytale.server.core.universe.world.storage.EntityStore>()
+                @Suppress("UNCHECKED_CAST")
+                val kotlinPlayerRefs = playerRefs as MutableList<com.hypixel.hytale.component.Ref<EntityStore>>
+
+                playerSpatialResource.getSpatialStructure().collect(particlePositionOffset, ParticleUtil.DEFAULT_PARTICLE_DISTANCE, playerRefs)
+
+                // Call ParticleUtil overload with explicit coordinates, rotation(0), scale=3, no sourceRef, null color
+                ParticleUtil.spawnParticleEffect(
+                    "Beam_Heal_Green_Old",
+                    particlePosition.x,
+                    particlePosition.y,
+                    particlePosition.z,
+                    0f,
+                    0f,
+                    0f,
+                    3.0f,
+                    null,
+                    null,
+                    playerRefs,
+                    store
+                )
+
 
                 val spawnResult = NPCPlugin.get().spawnNPC(store, adultName, null, spawnPos, transform.rotation)
                 
