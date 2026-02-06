@@ -358,6 +358,13 @@
           "Speed": 1.2
         }
       ]
+    },
+    "Grow": {
+      "Animations": [
+        {
+          "Animation": "Characters/Animations/Grow.blockyanim"
+        }
+      ]
     }
   },
   "CrouchOffset": -0.2

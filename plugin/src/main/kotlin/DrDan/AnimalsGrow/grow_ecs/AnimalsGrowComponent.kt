@@ -40,21 +40,4 @@ class AnimalsGrowComponent : Component<EntityStore> {
         val elapsedSeconds = java.time.Duration.between(spawnTime, currentGameTime).seconds
         return (growthDurationSeconds - elapsedSeconds).coerceAtLeast(0L)
     }
-
-    // Animation
-    companion object {
-    @JvmStatic
-    var CODEC:BuilderCodec<AnimalsGrowComponent> = BuilderCodec.builder(AnimalsGrowComponent.class, AnimalsGrowComponent::new)
-        .append(
-                new KeyedCodec<String>("Grow", Codec.STRING),
-                (o, v) -> o.animationName = v,
-                (o) -> o.animationName
-        )
-        .add()
-        .build();
-    }
-
-    public String getAnimationName() {
-        return growAnimation;
-    }
 }

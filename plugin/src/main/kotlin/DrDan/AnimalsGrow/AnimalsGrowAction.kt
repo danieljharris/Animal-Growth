@@ -14,12 +14,16 @@ import com.hypixel.hytale.component.CommandBuffer
 import com.hypixel.hytale.component.ComponentType
 import com.hypixel.hytale.server.core.universe.Universe
 import com.hypixel.hytale.server.npc.entities.NPCEntity
+import com.hypixel.hytale.server.core.entity.AnimationUtils;
 import com.hypixel.hytale.server.core.entity.nameplate.Nameplate
+import com.hypixel.hytale.protocol.packets.entities.PlayAnimation
 import com.hypixel.hytale.server.core.entity.effect.ActiveEntityEffect
 import com.hypixel.hytale.server.core.modules.entitystats.EntityStatMap
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore
+import com.hypixel.hytale.server.core.asset.type.model.config.ModelAsset
 import com.hypixel.hytale.server.core.entity.effect.EffectControllerComponent
+import com.hypixel.hytale.server.core.modules.entity.component.ModelComponent
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent
 import com.hypixel.hytale.server.core.modules.entity.component.DisplayNameComponent
 import com.hypixel.hytale.server.core.modules.entitystats.asset.DefaultEntityStatTypes
@@ -121,14 +125,22 @@ object AnimalsGrowAction {
                 )
 
                 val spawnResult = NPCPlugin.get().spawnNPC(store, adultName, null, spawnPos, transform.rotation)
-                
-                // TODO: figure out how to play annimation
-                npcEntity.playAnimation(ref, AnimationSlot.Action, "Grow")
 
-                commandBuffer.removeEntity(ref, RemoveReason.REMOVE) // Remove the baby entity
+                // npcEntity.playAnimation(ref, AnimationSlot.Action, "Grow", commandBuffer)
 
                 val adultRef = spawnResult?.first()
-                if (adultRef != null) { applyTransferProperties(adultRef, store, transfer) }
+                if (adultRef != null) {
+                    // Play Grow animation on the newly spawned adult
+                    val adultNpc = store.getComponent(adultRef, npcComponentType)
+                    if (adultNpc != null) {
+                        adultNpc.playAnimation(adultRef, AnimationSlot.Action, "Grow", commandBuffer)
+                    }
+
+                    applyTransferProperties(adultRef, store, transfer)
+                }
+
+                // Finally remove the baby entity
+                commandBuffer.removeEntity(ref, RemoveReason.REMOVE)
             }
         } else {
             println("ERROR: Could not get default world from Universe!")

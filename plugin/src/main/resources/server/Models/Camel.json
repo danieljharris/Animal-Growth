@@ -361,6 +361,13 @@
           "Animation": "NPC/Livestock/Camel/Animations/Swim/Swim_Fast.blockyanim"
         }
       ]
+    },
+    "Grow": {
+      "Animations": [
+        {
+          "Animation": "Characters/Animations/Grow.blockyanim"
+        }
+      ]
     }
   }
 }

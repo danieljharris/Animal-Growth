@@ -403,6 +403,13 @@
           "Speed": 1.0
         }
       ]
+    },
+    "Grow": {
+      "Animations": [
+        {
+          "Animation": "Characters/Animations/Grow.blockyanim"
+        }
+      ]
     }
   },
   "RandomAttachmentSets": {

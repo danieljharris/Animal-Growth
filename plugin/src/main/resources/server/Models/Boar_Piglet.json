@@ -93,9 +93,7 @@
     "Grow": {
       "Animations": [
         {
-          "Animation": "Animations/Grow.blockyanim",
-          "Looping": false,
-          "Speed": 1.0
+          "Animation": "Characters/Animations/Grow.blockyanim"
         }
       ]
     }
