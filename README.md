@@ -32,6 +32,7 @@ Connect your Hytale client to the **first IP address** returned (typically the c
 Example: If `hostname -I` returns `172.17.0.2 172.18.0.1`, connect to `172.17.0.2:5520`
 
 
+# Useful Commands For Developing Mods in Hytale
 ## Search for Hytale import
 Swap out "DefaultEntityStatTypes|EntityStatTypes"
 ```bash
