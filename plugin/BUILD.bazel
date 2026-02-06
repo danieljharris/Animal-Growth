@@ -37,22 +37,6 @@ genrule(
     cmd = "cp $< $@",
 )
 
-# Package src/main/resources into a Java resource library so Bazel builds include them
-filegroup(
-    name = "resource_files",
-    srcs = glob([
-        "src/main/resources/**",
-    ], exclude = ["src/main/resources/**/BUILD.bazel"]),
-    visibility = ["//visibility:public"],
-)
-
-java_library(
-    name = "resources_lib",
-    resources = [":resource_files"],
-    resource_strip_prefix = "plugin/src/main/resources",
-    visibility = ["//visibility:public"],
-)
-
 java_library(
     name = "assets_lib",
     resources = ["//plugin/assets"],
@@ -78,7 +62,6 @@ java_binary(
         ":plugin_lib",
         ":assets_lib",
         ":manifest_lib",
-        ":resources_lib",
     ] + provided_deps,
 )
 
