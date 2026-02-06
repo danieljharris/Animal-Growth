@@ -1,6 +1,6 @@
 # Animal Growth - Hytale Plugin
 
-
+[![GitHub Repo](https://img.shields.io/badge/GitHub-Animal_Growth-blue?logo=github)](https://github.com/danieljharris/Animal-Growth)
 
 # Details About the Repo & Code/Test Structure
 ## Scripts
