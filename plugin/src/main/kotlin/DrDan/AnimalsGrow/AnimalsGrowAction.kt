@@ -79,124 +79,120 @@ object AnimalsGrowAction {
         commandBuffer.removeEntity(ref, RemoveReason.REMOVE)
         
         // Spawn on world thread for thread safety
-        val world = Universe.get().defaultWorld
-        if (world != null) {
-            world.execute {
-                var spawnPos = transform.position
+        val world = store.getExternalData().getWorld()
+        world.execute {
+            var spawnPos = transform.position
 
-                var xSide: Int
-                var zSide: Int
+            var xSide: Int
+            var zSide: Int
 
-                if (spawnPos.x - spawnPos.x.toInt() > 0.5) {
-                    xSide = 1
-                }
-                else {
-                    xSide = -1
-                }
+            if (spawnPos.x - spawnPos.x.toInt() > 0.5) {
+                xSide = 1
+            }
+            else {
+                xSide = -1
+            }
 
-                if (spawnPos.z - spawnPos.z.toInt() > 0.5) {
-                    zSide = 1
-                }
-                else {
-                    zSide = -1
-                }
+            if (spawnPos.z - spawnPos.z.toInt() > 0.5) {
+                zSide = 1
+            }
+            else {
+                zSide = -1
+            }
 
-                var blockSpawnPos = Vector3i(
-                    spawnPos.x.toInt(),
-                    spawnPos.y.toInt(),
-                    spawnPos.z.toInt()
-                )
+            var blockSpawnPos = Vector3i(
+                spawnPos.x.toInt(),
+                spawnPos.y.toInt(),
+                spawnPos.z.toInt()
+            )
 
-                var blockType: BlockType = world.getBlockType(blockSpawnPos)?: return@execute
-                var material: BlockMaterial = blockType.material
+            var blockType: BlockType = world.getBlockType(blockSpawnPos)?: return@execute
+            var material: BlockMaterial = blockType.material
 
-                // Searches for the cloest empty block
-                val offsets = listOf(
-                    Vector3i(xSide, 0, 0),
-                    Vector3i(0, 0, zSide),
-                    Vector3i(xSide, 0, zSide),
-                )
+            // Searches for the cloest empty block
+            val offsets = listOf(
+                Vector3i(xSide, 0, 0),
+                Vector3i(0, 0, zSide),
+                Vector3i(xSide, 0, zSide),
+            )
 
-                // Searches for any blocks the adult may grow into
-                val offsetsInverse = listOf(
-                    Vector3i(-xSide, 0, 0),
-                    Vector3i(0, 0, -zSide),
-                    Vector3i(-xSide, 0, -zSide),
-                )
+            // Searches for any blocks the adult may grow into
+            val offsetsInverse = listOf(
+                Vector3i(-xSide, 0, 0),
+                Vector3i(0, 0, -zSide),
+                Vector3i(-xSide, 0, -zSide),
+            )
 
-                if (material == BlockMaterial.Solid) {
-                    println("Spawn position blocked for adult at ${spawnPos}, searching nearby...")
-                    for (offset in offsets) {
+            if (material == BlockMaterial.Solid) {
+                println("Spawn position blocked for adult at ${spawnPos}, searching nearby...")
+                for (offset in offsets) {
 
-                        var tempSpawnPos = blockSpawnPos
-                        var tempSpawnPosOffset = tempSpawnPos.add(offset)
+                    var tempSpawnPos = blockSpawnPos
+                    var tempSpawnPosOffset = tempSpawnPos.add(offset)
 
-                        val checkBlockType = world.getBlockType(tempSpawnPosOffset) ?: continue
-                        if (checkBlockType.material == BlockMaterial.Empty) {
-                            spawnPos = tempSpawnPosOffset.toVector3d()
-                            println("Found nearby spawn position for adult at ${spawnPos}")
-                            break
-                        }
+                    val checkBlockType = world.getBlockType(tempSpawnPosOffset) ?: continue
+                    if (checkBlockType.material == BlockMaterial.Empty) {
+                        spawnPos = tempSpawnPosOffset.toVector3d()
+                        println("Found nearby spawn position for adult at ${spawnPos}")
+                        break
                     }
+                }
 
+                spawnPos = Vector3d(
+                    spawnPos.x.toInt().toDouble() + 0.5,
+                    spawnPos.y.toInt().toDouble(),
+                    spawnPos.z.toInt().toDouble() + 0.5
+                )
+            }
+            else {
+                println("Spawn position clear for adult at ${spawnPos}")
+
+                val neighborHasBlocks = offsetsInverse.any { offset ->
+                    var tempSpawnPos = blockSpawnPos
+                    var tempSpawnPosOffset = tempSpawnPos.add(offset)
+                    val bt = world.getBlockType(tempSpawnPosOffset)
+                    bt != null && bt.material != BlockMaterial.Empty
+                }
+
+                // If block close to baby move adult to center of the block to avoid gtowing into the block
+                if (neighborHasBlocks) {
                     spawnPos = Vector3d(
                         spawnPos.x.toInt().toDouble() + 0.5,
                         spawnPos.y.toInt().toDouble(),
                         spawnPos.z.toInt().toDouble() + 0.5
                     )
                 }
-                else {
-                    println("Spawn position clear for adult at ${spawnPos}")
-
-                    val neighborHasBlocks = offsetsInverse.any { offset ->
-                        var tempSpawnPos = blockSpawnPos
-                        var tempSpawnPosOffset = tempSpawnPos.add(offset)
-                        val bt = world.getBlockType(tempSpawnPosOffset)
-                        bt != null && bt.material != BlockMaterial.Empty
-                    }
-
-                    // If block close to baby move adult to center of the block to avoid gtowing into the block
-                    if (neighborHasBlocks) {
-                        spawnPos = Vector3d(
-                            spawnPos.x.toInt().toDouble() + 0.5,
-                            spawnPos.y.toInt().toDouble(),
-                            spawnPos.z.toInt().toDouble() + 0.5
-                        )
-                    }
-                }
-
-                val particlePosition = spawnPos
-                val particlePositionOffset = particlePosition.add(Vector3d(0.0, 0.5, 0.0))
-
-                val playerSpatialResource = store.getResource(EntityModule.get().getPlayerSpatialResourceType()) as? SpatialResource<Ref<EntityStore>, EntityStore>
-                    ?: return@execute
-                val playerRefs = SpatialResource.getThreadLocalReferenceList<EntityStore>()
-                playerSpatialResource.getSpatialStructure().collect(particlePositionOffset, ParticleUtil.DEFAULT_PARTICLE_DISTANCE, playerRefs)
-
-                // Call ParticleUtil overload with explicit coordinates, rotation(0), scale=3, no sourceRef, null color
-                ParticleUtil.spawnParticleEffect(
-                    "Beam_Heal_Green_Old",
-                    particlePosition.x,
-                    particlePosition.y,
-                    particlePosition.z,
-                    0f,
-                    0f,
-                    0f,
-                    3.0f,
-                    null,
-                    null,
-                    playerRefs,
-                    store
-                )
-
-
-                val spawnResult = NPCPlugin.get().spawnNPC(store, adultName, null, spawnPos, transform.rotation)
-                
-                val adultRef = spawnResult?.first()
-                if (adultRef != null) { applyTransferProperties(adultRef, store, transfer) }
             }
-        } else {
-            println("ERROR: Could not get default world from Universe!")
+
+            val particlePosition = spawnPos
+            val particlePositionOffset = particlePosition.add(Vector3d(0.0, 0.5, 0.0))
+
+            val playerSpatialResource = store.getResource(EntityModule.get().getPlayerSpatialResourceType()) as? SpatialResource<Ref<EntityStore>, EntityStore>
+                ?: return@execute
+            val playerRefs = SpatialResource.getThreadLocalReferenceList<EntityStore>()
+            playerSpatialResource.getSpatialStructure().collect(particlePositionOffset, ParticleUtil.DEFAULT_PARTICLE_DISTANCE, playerRefs)
+
+            // Call ParticleUtil overload with explicit coordinates, rotation(0), scale=3, no sourceRef, null color
+            ParticleUtil.spawnParticleEffect(
+                "Beam_Heal_Green_Old",
+                particlePosition.x,
+                particlePosition.y,
+                particlePosition.z,
+                0f,
+                0f,
+                0f,
+                3.0f,
+                null,
+                null,
+                playerRefs,
+                store
+            )
+
+
+            val spawnResult = NPCPlugin.get().spawnNPC(store, adultName, null, spawnPos, transform.rotation)
+            
+            val adultRef = spawnResult?.first()
+            if (adultRef != null) { applyTransferProperties(adultRef, store, transfer) }
         }
     }
     

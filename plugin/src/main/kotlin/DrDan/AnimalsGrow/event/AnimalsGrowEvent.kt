@@ -36,9 +36,6 @@ class AnimalsGrowEvent(
         store: Store<EntityStore>,
         commandBuffer: CommandBuffer<EntityStore>
     ) {
-        if (reason != AddReason.SPAWN) return
-
-        // Skip if already has AnimalsGrowComponent
         if (store.getComponent(ref, AnimalsGrow.getComponentType()) != null) return
 
         val npcComponentType = NPCEntity.getComponentType() as? ComponentType<EntityStore, NPCEntity> ?: return

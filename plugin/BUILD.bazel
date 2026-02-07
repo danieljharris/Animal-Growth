@@ -24,6 +24,14 @@ kt_jvm_library(
     ],
 )
 
+# kt_jvm_library(
+#     name = "plugin_lib",
+#     srcs = glob(["src/main/kotlin/DrDan/AnimalsBreed/**/*.kt"]),
+#     deps = shade_deps + provided_deps + [
+#         "@maven//:org_jetbrains_kotlin_kotlin_stdlib",
+#     ],
+# )
+
 java_library(
     name = "assets_lib",
     resources = ["//plugin/assets"],

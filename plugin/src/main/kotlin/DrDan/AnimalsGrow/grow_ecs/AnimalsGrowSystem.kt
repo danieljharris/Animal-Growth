@@ -16,20 +16,20 @@ import DrDan.AnimalsGrow.AnimalsGrowAction
 import com.hypixel.hytale.math.vector.Vector3d
 import com.hypixel.hytale.math.vector.Vector3f
 
-data class GrowthSpawn(val npcName: String, val position: Vector3d, val rotation: Vector3f)
-
 /**
- * System that checks animal growth based on in-game time.
+ * System that checks animal growth based on in-game time
  * 
- * Uses WorldTimeResource to get the current in-game time, which advances
- * faster when players sleep. This means animals will grow faster when
- * players sleep, just like crops do in Hytale.
+ * Uses WorldTimeResource to get the current in-game time
+ * which advances faster when players sleep
+ * 
+ * This means animals will grow faster when players sleep
+ * just like crops do in Hytale
  */
 class AnimalsGrowSystem : EntityTickingSystem<EntityStore>() {
     
     // Log throttle - only log every N ticks to reduce spam
-    private var tickCount = 0
-    private val logInterval = 100 // Log every 100 ticks (~5 seconds at 20 TPS)
+    // private var tickCount = 0
+    // private val logInterval = 100 // Log every 100 ticks (~5 seconds at 20 TPS)
 
     override fun tick(
         dt: Float,
@@ -48,16 +48,16 @@ class AnimalsGrowSystem : EntityTickingSystem<EntityStore>() {
         // Check if animal should grow based on in-game time elapsed
         if (animalsGrow.shouldGrow(currentGameTime)) {
             AnimalsGrowAction.grow(ref, store, commandBuffer)
-            println("AnimalsGrowSystem: Animal has grown up! (In-game time based)")
+            // println("AnimalsGrowSystem: Animal has grown up! (In-game time based)")
         } else {
             // Throttled progress logging
-            tickCount++
-            if (tickCount >= logInterval) {
-                tickCount = 0
-                val progress = animalsGrow.getGrowthProgress(currentGameTime)
-                val remaining = animalsGrow.getRemainingSeconds(currentGameTime)
-                println("AnimalsGrowSystem: Growth progress: ${(progress * 100).toInt()}%, ${remaining}s remaining (in-game time)")
-            }
+            // tickCount++
+            // if (tickCount >= logInterval) {
+            //     tickCount = 0
+            //     val progress = animalsGrow.getGrowthProgress(currentGameTime)
+            //     val remaining = animalsGrow.getRemainingSeconds(currentGameTime)
+            //     println("AnimalsGrowSystem: Growth progress: ${(progress * 100).toInt()}%, ${remaining}s remaining (in-game time)")
+            // }
         }
     }
 

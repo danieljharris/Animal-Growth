@@ -54,11 +54,12 @@ if [ -f /tmp/hytale_java.pid ] && kill -0 $(cat /tmp/hytale_java.pid) 2>/dev/nul
     echo "Detected running Hytale server. Reloading plugin..."
     
     if [ -p "$COMMAND_PIPE" ]; then
-        echo "plugin reload DrDan:AnimalsGrow" > "$COMMAND_PIPE"
-        echo "✓ Reload command sent to server."
+        echo "plugin reload DrDan:LifeCycle" > "$COMMAND_PIPE"
+        echo "say Reloading DrDan:LifeCycle..." > "$COMMAND_PIPE"
+        echo " ↺ Reload command sent to server"
     else
         echo "⚠ Server is running but command pipe not found."
-        echo "  Please manually run: /plugin reload DrDan:AnimalsGrow"
+        echo "Please manually run: /plugin reload DrDan:LifeCycle"
     fi
 else
     echo "No running Hytale server detected. Plugin will load on next server start."

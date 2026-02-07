@@ -1,5 +1,5 @@
-ARTIFACT_NAME = "AnimalsGrow"
-VERSION = "0.1.0"
+ARTIFACT_NAME = "LifeCycle"
+VERSION = "0.1.1"
 GROUP = "DrDan"
 
 CONFIG = {
