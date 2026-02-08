@@ -6,7 +6,7 @@ CONFIG = {
     "Version": VERSION,
     "Name": ARTIFACT_NAME,
     "Group": GROUP,
-    "Main": GROUP + ".AnimalsGrow.AnimalsGrow",
+    "Main": GROUP + ".LifeCycle.LifeCycleMain",
     "IncludesAssetPack": True,
     "Authors": [
         {
